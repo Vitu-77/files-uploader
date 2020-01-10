@@ -12,6 +12,7 @@ const DropZoneCircle = styled.div`
     grid-column: span 3;
     grid-row: span 3;
     transition: 300ms;
+    margin-bottom: 30px;
 
     &:hover{
         border-color: rgba(168, 40, 253, 1);

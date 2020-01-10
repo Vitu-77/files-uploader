@@ -10,95 +10,66 @@ const Upload = () => {
     const [files, setFiles] = useState([]);
     const [progress, setProgress] = useState(0);
 
-    const storeFiles = () => {
+    const [logo, setLogo] = useState();
+    const [bg, setBg] = useState();
 
-        const filesList = document.querySelector('input').files;
-        const filesArray = Array.from(filesList);
+    // const [logo, setLogo] = useState()
 
-        setFiles((files) => [...files, ...filesArray]);
+    const storeLogo = () => {
+        const logo = document.querySelector('#logo').files[0];
+        setLogo(logo);
     }
 
-    const uploadFiles = async (fileType) => {
+    const storeBg = () => {
+        const bg = document.querySelector('#bg').files[0];
+        setBg(bg);
+    }
 
-        const promises = [];
-
-        if (fileType === 1) {
-            files.forEach((file) => {
-                promises.push(sendPodcast(file));
-            });
-        }
-        else if (fileType === 2) {
-            files.forEach((file) => {
-                promises.push(sendUser(file));
-            });
-        }
-
+    const uploadFiles = async () => {
         try {
-            await Promise.all(promises);
-        } catch (error) {
-            console.log(error);
-        }
-    }
-
-    const sendPodcast = (podcast) => {
-        return new Promise((resolve, reject) => {
             const req = new XMLHttpRequest();
-            const podcastName = 'Podcast 5';
-
-            req.upload.addEventListener('progress', (e) => {
-                const percentage = (e.loaded / e.total) * 100;
-                setProgress(percentage);
-            });
-
             const formData = new FormData();
-            formData.append("podcast", podcast, podcastName);
 
-            req.open("post", "http://localhost:3333/podcasts/new");
-            req.send(formData);
-        });
-    }
-
-    //? NOVO USER
-    const sendUser = (userAvatar) => {
-        console.log('novo user');
-        return new Promise((resolve, reject) => {
-            const req = new XMLHttpRequest();
-
-            const user = {
-                username: 'john123',
-                password: '111',
-                name: 'João das Neves',
-                acess_level: 1,
+            const office = {
+                username: 'Office 001',
+                password: '123',
+                name: 'Office 001',
             }
 
             req.upload.addEventListener('progress', (e) => {
+
                 const percentage = (e.loaded / e.total) * 100;
-                setProgress(percentage);
+
+                if (percentage < 100) {
+                    setProgress(percentage);
+                }
+                else {
+                    setProgress(0);
+                }
             });
 
-            const formData = new FormData();
+            formData.append('logo_image', logo);
+            formData.append('background_image', bg);
+            formData.append('username', office.username);
+            formData.append('password', office.password);
+            formData.append('name', office.name);
+            formData.append('authorization', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJsb2dnZWQiOnsidXNlcm5hbWUiOiJoaXRhbG8iLCJpZCI6ImFkbWluaXN0cmF0b3IxIiwidHlwZSI6ImFkbWluaXN0cmF0b3IifSwiaWF0IjoxNTc4NjcwNjkzfQ.AgO3r7ihFXrpAbocsMiAiArBPF152_ESWtPYJ70VhFM');
 
-            formData.append("userAvatar", userAvatar);
-            formData.append("username", user.username);
-            formData.append("password", user.password);
-            formData.append("name", user.name);
-            formData.append("acess_level", user.acess_level);
-
-            req.open("post", "http://localhost:3333/users/new");
-            req.send(formData);
-        });
+            req.open('POST', 'http://localhost:3333/upload');
+            await req.send(formData);
+        } catch (error) {
+            console.log({ error })
+        }
     }
 
     return (
         <React.Fragment>
             <UploadContainer>
-                <Dropzone handleChange={storeFiles} />
-                {files.length > 0 ? <FilesList filesArray={files} progress={progress} /> : <EmptyList>Empty</EmptyList>}
-                <UploadButton
-                    onClick={() => uploadFiles(1)}
-                    disabled={!files.length}
-                    style={!files.length ? { opacity: '.5', pointerEvents: 'none' } : null}
-                >Upload</UploadButton>
+                <Dropzone id='logo' handleChange={() => storeLogo()} label='LOGO' />
+                <Dropzone id='bg' handleChange={() => storeBg()} label='BG' />
+                <UploadButton onClick={uploadFiles}>
+                    Upload
+                </UploadButton>
             </UploadContainer>
         </React.Fragment>
     )

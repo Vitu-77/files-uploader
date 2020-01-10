@@ -4,7 +4,7 @@ const uploadController = require('../controllers/uploadController');
 const path = require('path');
 const fs = require('fs');
 
-router.post('/', uploadController);
+router.post('/upload', uploadController);
 
 router.get('/', (req, res) => {
 

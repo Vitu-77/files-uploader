@@ -15,7 +15,7 @@ const uploadRoute = require('./src/routes/upload');
 server.use(express.static('uploads'));
 
 server.use(cors(corsOptions));
-server.use('/upload', uploadRoute);
+server.use(uploadRoute);
 
 server.listen(PORT, () => {
     console.log(`> Server is running on the port ${PORT}`);
